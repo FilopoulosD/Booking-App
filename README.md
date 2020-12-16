@@ -16,3 +16,6 @@ mydb = mysql.connector.connect(
 )
 
 
+For now the static and templates folders are NOT in use. 
+Future goals involve the use of the flask framework and the above folders are created with that in mind.
+
