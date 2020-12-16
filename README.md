@@ -16,4 +16,3 @@ mydb = mysql.connector.connect(
 )
 
 
-IGNORE THE .idea FILE
