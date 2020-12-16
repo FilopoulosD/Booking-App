@@ -14,3 +14,6 @@ mydb = mysql.connector.connect(
   database="NameOfDatabase",
   password="YourPassword"
 )
+
+
+IGNORE THE .idea FILE
