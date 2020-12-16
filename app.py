@@ -95,7 +95,7 @@ while True:
       wifi2 = input("Give position's status for wifi\n")
       annual2 = input("Give position's status for annual rent\n")
       maxnum2 = int(input("Give position's max number\n"))
-      val2 = (id, type, usagecost, electricity, wifi, annual, maxnum)
+      val2 = (id2, type2, usagecost2, electricity2, wifi2, annual2, maxnum2)
       print(val2)
       query2 ="INSERT INTO Position (Id,Type,`Usage Cost`,Electricity,Wifi,`Available for annual book`,`Max number`)"\
               "VALUES (%s,%s,%s,%s,%s,%s,%s);"
@@ -194,56 +194,36 @@ while True:
   ## Check In
   elif (a == '4'):
     try:
-
-      ### Booking's Id
-      query41 = "SELECT Id FROM Booking"
+      query41 = "SELECT Id FROM Customers"
       cursor.execute(query41)
-      result4 = cursor.fetchall()
-      print("Choose a booking's Id from the following\n")
-      for x in result4:
-        print("Booking's Id: {}\n".format(x[0]))
-      custId4 = int(input("Give booking's Id:\n"))
+      result41 = cursor.fetchall()
+      print("Choose a customers Id from the following\n")
+      for x in result41:
+        print("Customer's Id: {}\n".format(x[0]))
+      custId4 = int(input("Give customers's Id:\n"))
 
+      query42= "SELECT Id FROM Position"
+      cursor.execute(query42)
+      result42=cursor.fetchall()
+      print("Choose a position's Id from the following\n")
+      for i in result42:
+        print("Position's Id: {}\n".format(i[0]))
+      posId4= int(input("Give Position's Id: \n"))
 
-      ### Check In date
+      arrival4=today
 
-      arrival4 = today.strftime('%Y-%m-%d')
+      year4 = int(input('Enter year of arranged departure\n'))
+      month4 = int(input('Enter month of arranged departure\n'))
+      day4 = int(input('Enter day of arranged departure\n'))
+      date4 = datetime.date(year4, month4, day4)
+      BookingDate4 = date4.strftime('%Y-%m-%d')
 
-
-      ### Due Date of Departure
-      while True:
-        try:
-          ### Departure
-          year42 = int(input('Enter arranged year of departure\n'))
-          month42 = int(input('Enter arranged month of departure\n'))
-          day42 = int(input('Enter arranged day of departure\n'))
-          date42 = datetime.date(year42, month42, day42)
-          departure4 = date42.strftime('%Y-%m-%d')
-          if today > date42:
-            raise ArrivalAfterDeparture
-          else:
-            break
-        except ArrivalAfterDeparture:
-          print("The Arrival date is after Departure. Please Give again the correct departure date")
-
-
-
-
-
-      val4=(custId4,arrival4,departure4)
-
-      query42 = "INSERT INTO  CheckIn(`Booking Id`,`Arrival Date`, `Due date of departure`)" \
-                "VALUES (%s,%s,%s)"
-      cursor.execute(query42, val4)
+      val4=(posId4,custId4,arrival4,BookingDate4)
+      query43="INSERT INTO CheckIn(`Position Id`,`Customers Id`,`Arrival Date`,`Due date of departure`) VALUES (%s,%s,%s,%s)"
+      cursor.execute(query43, val4)
       mydb.commit()
     except mysql.connector.Error as error:
       print("Something went wrong: {} \n".format(error))
-
-      if error.errno == 1452:
-          print("There was a problem with the Booking's id. Please choose an id that exists on the database\n")
-      else:
-        print("There was an unexpected error")
-
 
   ## Show Current Customers On Camping
   elif (a == '5'):

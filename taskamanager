@@ -1,0 +1,12 @@
+Working properly:
+add customer
+add position
+add booking
+check in
+show all customers w/ csv & tkinter
+show all bookings w/ csv & tkinter
+
+Future version must include:
+check if user wants to add his inputs in db
+custom flags when there are errors in date (e.g. month>12)
+Changes in CheckIn Table for a check in with no active booking
