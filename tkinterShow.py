@@ -1,5 +1,6 @@
 import tkinter
 import csv
+
 def showcsv(filename):
 
     root = tkinter.Tk()
@@ -14,10 +15,13 @@ def showcsv(filename):
           c = 0
           for row in col:
              # i've added some styling
-             label = tkinter.Label(root, width = 10, height = 2, \
+             label = tkinter.Label(root, width = 20, height = 2, \
                                    text = row, relief = tkinter.RIDGE)
              label.grid(row = r, column = c)
              c += 1
           r += 1
 
     root.mainloop()
+
+
+
