@@ -1,4 +1,3 @@
-
 def create_csv(tuple1,firstrow):
     print("Writing File")
     f = open("file.csv", "w")
