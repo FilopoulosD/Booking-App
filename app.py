@@ -36,7 +36,7 @@ while True:
 
       id1=int(input("Give customer's Id\n"))
       name1=input("Give customer's full name\n")
-      print("Does the customer has another customers who is responsible?If yes please press Yes!")
+      print("Does the customer has another customers who is responsible?If so please type Yes!")
       ans=input()
       if ans in ["YES","Yes","yes"]:
         print("Please choose the main customer from below:\n")
@@ -79,9 +79,12 @@ while True:
     except mysql.connector.Error as error:
       print("Something went wrong: {} \n".format(error))
       if error.errno == 1062:
-        print("The Customer's id you choose is already in the system")
+        if 'Customers.SSN' in error.msg:
+          print("The customer's SSN is already in the database")
+        else:
+          print("The Customer's id is already in the system")
       elif error.errno == 1452:
-        print("The Id you give for main customer is not in the database. Please select an id that's correct")
+        print("The Id for main customer is not in the database. Please select an id that's correct")
       else:
         print("There was an unexpected error")
 
@@ -227,11 +230,29 @@ while True:
 
   ## Show Current Customers On Camping
   elif (a == '5'):
-    print(a)
+    query5="select `Position Id`, `Customers Id`,`Arrival Date`, `Due date of departure`, `Full name`,`Phone number`,`ADT` " \
+           "from CheckIn join Customers " \
+           "where `Due date of departure`>curdate() " \
+           "and `Position Id` = Id"
+
+    cursor.execute(query5)
+    result5= cursor.fetchall()
+    print(result5)
+    firstrow5=[("Position's Id", "Customer's Id", "Arrival Date"," Departure Date"," Full Name","Phone Number","Social Security Number")]
+    create_csv(result5,firstrow5)
+    showcsv("file.csv")
 
   ## Show Future Arrivals
   elif (a == '6'):
-    print(a)
+    query6="select  * from Booking " \
+           "WHERE `Due date of arrival`>curdate();"
+    cursor.execute(query6)
+    result6 = cursor.fetchall()
+    print(result6)
+    firstrow6 = [("Id", "Customer's Id", "Position's Id", " Date of Arranged Arrival", " Date of Departure", "Advance",
+                  "Total Cost","Condition", "Type","Booking Date")]
+    create_csv(result6, firstrow6)
+    showcsv("file.csv")
   ## Show All Customers
   elif (a == '7'):
     query="SELECT * FROM Customers"
