@@ -54,6 +54,11 @@ while True:
       year1 = int(input('Enter year of birth\n'))
       month1 = int(input('Enter month of birt\n'))
       day1 = int(input('Enter day of birth\n'))
+      while month1>13 or month1<1 or day1>31 or day1<0:
+        print("There is an error with the dates.Please type again.")
+        month1 = int(input('Enter month of birt\n'))
+        day1 = int(input('Enter day of birth\n'))
+
       date1 = datetime.date(year1, month1, day1)
       formatted_date1 = date1.strftime('%Y-%m-%d')
 
@@ -69,13 +74,18 @@ while True:
       cpd1=float(input("Give cost per day\n"))
       tc1=0
       val1=(id1,name1,resId1,phone1,formatted_date1,adt1,cpd1,tc1)
+      print("Are you sure you want to add to customers the following:\n",val1, "\nIf so type yes.")
+      add1=input()
+      if add1 in ["YES","Yes","yes"]:
 
-      print(val1)
 
-      query1 = "INSERT INTO  Customers(Id,`Full name`,ResId,`Phone number`,Birthdate,ADT,`Cost per day`,`Total cost`)" \
-              "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
-      cursor.execute(query1, val1)
-      mydb.commit()
+        query1 = "INSERT INTO  Customers(Id,`Full name`,ResId,`Phone number`,Birthdate,ADT,`Cost per day`,`Total cost`)" \
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+        cursor.execute(query1, val1)
+        mydb.commit()
+        print("A new customer was added to the database")
+      else:
+        print("Operation Interupted ")
     except mysql.connector.Error as error:
       print("Something went wrong: {} \n".format(error))
       if error.errno == 1062:
@@ -99,11 +109,19 @@ while True:
       annual2 = input("Give position's status for annual rent\n")
       maxnum2 = int(input("Give position's max number\n"))
       val2 = (id2, type2, usagecost2, electricity2, wifi2, annual2, maxnum2)
-      print(val2)
-      query2 ="INSERT INTO Position (Id,Type,`Usage Cost`,Electricity,Wifi,`Available for annual book`,`Max number`)"\
-              "VALUES (%s,%s,%s,%s,%s,%s,%s);"
-      cursor.execute(query2,val2)
-      mydb.commit()
+      print("Are you sure you want to add to positions the following:\n",val2, "\nif so type yes.")
+      add2 = input()
+      if add2 in ["YES", "Yes", "yes"]:
+        query2 = "INSERT INTO Position (Id,Type,`Usage Cost`,Electricity,Wifi,`Available for annual book`,`Max number`)" \
+                 "VALUES (%s,%s,%s,%s,%s,%s,%s);"
+        cursor.execute(query2, val2)
+        mydb.commit()
+        print("A new position was added to the database")
+
+      else:
+        print("Operation Interupted ")
+
+
     except mysql.connector.Error as error:
       print("Something went wrong: {} \n".format(error))
       if error.errno == 1062:
@@ -140,11 +158,19 @@ while True:
           year31 = int(input('Enter arranged year of arrival\n'))
           month31 = int(input('Enter arranged month of arrival\n'))
           day31 = int(input('Enter arranged day of arrival\n'))
+          while month31 > 13 or month31 < 1 or day31 > 31 or day31 < 0:
+            print("There is an error with the dates.Please type again.")
+            month31 = int(input('Enter month of birt\n'))
+            day31 = int(input('Enter day of birth\n'))
           date31 = datetime.date(year31, month31, day31)
           ### Departure
           year32 = int(input('Enter arranged year of departure\n'))
           month32 = int(input('Enter arranged month of departure\n'))
           day32 = int(input('Enter arranged day of departure\n'))
+          while month32 > 13 or month32 < 1 or day32 > 31 or day32 < 0:
+            print("There is an error with the dates.Please type again.")
+            month32 = int(input('Enter month of birt\n'))
+            day32 = int(input('Enter day of birth\n'))
           date32 = datetime.date(year32, month32, day32)
 
           arrival3 = date31.strftime('%Y-%m-%d')
@@ -167,16 +193,28 @@ while True:
       year33 = int(input('Enter year of booking\n'))
       month33 = int(input('Enter month of booking\n'))
       day33 = int(input('Enter day of booking\n'))
+      while month33 > 13 or month33 < 1 or day33 > 31 or day33 < 0:
+        print("There is an error with the dates.Please type again.")
+        month33 = int(input('Enter month of birt\n'))
+        day33= int(input('Enter day of birth\n'))
       date33 = datetime.date(year33, month33, day33)
       BookingDate3 =date33.strftime('%Y-%m-%d')
 
       val3 = (id3, custId3, posId3, arrival3, departure3, advance3, totalcost3, condition3, Type3, BookingDate3)
+      print("Are you sure you want to add to bookings the following:\n", val3, "if so type yes.")
+      add3 = input()
+      if add3 in ["YES", "Yes", "yes"]:
+        query33 = "INSERT INTO  Booking(Id,`Customer Id`, `Position Id`,`Due date of arrival` ," \
+                  "`Due date of departure`,Advance,`Total Cost`, `Condition`,`Type`,`Booking Date`)" \
+                  "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 
-      query33 = "INSERT INTO  Booking(Id,`Customer Id`, `Position Id`,`Due date of arrival` ,`Due date of departure`,Advance,`Total Cost`, `Condition`,`Type`,`Booking Date`)" \
-              "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-      print(val3)
-      cursor.execute(query33, val3)
-      mydb.commit()
+        cursor.execute(query33, val3)
+        mydb.commit()
+        print("A new booking was added to the database")
+      else:
+        print("Operation Interupted ")
+
+
 ### Handle errors
     except mysql.connector.Error as error:
       print("Something went wrong: {} \n".format(error))
@@ -218,13 +256,23 @@ while True:
       year4 = int(input('Enter year of arranged departure\n'))
       month4 = int(input('Enter month of arranged departure\n'))
       day4 = int(input('Enter day of arranged departure\n'))
+      while month4 > 13 or month4 < 1 or day4 > 31 or day4 < 0:
+        print("There is an error with the dates.Please type again.")
+        month4 = int(input('Enter month of birt\n'))
+        day4 = int(input('Enter day of birth\n'))
       date4 = datetime.date(year4, month4, day4)
       BookingDate4 = date4.strftime('%Y-%m-%d')
 
       val4=(posId4,custId4,arrival4,BookingDate4)
-      query43="INSERT INTO CheckIn(`Position Id`,`Customers Id`,`Arrival Date`,`Due date of departure`) VALUES (%s,%s,%s,%s)"
-      cursor.execute(query43, val4)
-      mydb.commit()
+      print("Are you sure you want to add to check ins the following:\n", val4, "if so type yes.")
+      add4 = input()
+      if add4 in ["YES", "Yes", "yes"]:
+        query43 = "INSERT INTO CheckIn(`Position Id`,`Customers Id`,`Arrival Date`,`Due date of departure`) VALUES (%s,%s,%s,%s)"
+        cursor.execute(query43, val4)
+        mydb.commit()
+        print("A new check in was added to the database")
+      else:
+        print("Operation Interupted ")
     except mysql.connector.Error as error:
       print("Something went wrong: {} \n".format(error))
 
@@ -241,7 +289,6 @@ while True:
     firstrow5=[("Position's Id", "Customer's Id", "Arrival Date"," Departure Date"," Full Name","Phone Number","Social Security Number")]
     create_csv(result5,firstrow5)
     showcsv("file.csv")
-
   ## Show Future Arrivals
   elif (a == '6'):
     query6="select  * from Booking " \
@@ -262,7 +309,6 @@ while True:
     firstrow = [('Id', 'Full Name', 'ResId', 'Phone Number', 'Birthdate', 'ADT', 'Cost per Day', 'Total Cost')]
     create_csv(result,firstrow)
     showcsv("file.csv")
-
   ## Show All Bookings
   elif (a == '8'):
     query = "SELECT * FROM Booking"
@@ -272,7 +318,6 @@ while True:
     firstrow = [('Id', "Customer's Id", "Position's Id", 'Due Date of Arrival', 'Due Date of Departure', 'Advance', 'Total Cost', 'Condition','Type','Booking Date')]
     create_csv(result, firstrow)
     showcsv("file.csv")
-
   ## Show All Available Positions
   elif (a == '9'):
     print(a)
