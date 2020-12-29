@@ -4,6 +4,9 @@ from datetime import date
 from dbconnect import mydb
 from createcsv import create_csv
 from tkinterShow import showcsv
+from DeleteFileCSV import delete
+
+
 
 mydb
 
@@ -20,18 +23,23 @@ class ArrivalAfterDeparture(CustomError):
 today = date.today()
 
 while True:
+
+
   cursor = mydb.cursor()
   print("Select Action:\n1)Add a new Customer\n2)Add a new Position\n3)Add a new Booking\n4)Check In\n"
         "5)Show Current Customers On Camping\n6)Show Future Arrivals\n7)Show All Customers\n8)Show All Bookings\n"
-        "9)Show  Available Positions\n10)Exit")
+        "9)Show  Available Positions\n10)Cancel a Booking\n11)Search A Customer By Name\n20)Exit")
 
   a = input()
 
   ##Exit
-  if(a=='10'):
+  if(a=='20'):
+    delete("file.csv")
+    cursor.close()
+    mydb.close()
     break
   ## Add a new Customer
-  elif(a=='1'):
+  elif (a == '1'):
     try:
 
       id1=int(input("Give customer's Id\n"))
@@ -54,7 +62,7 @@ while True:
       year1 = int(input('Enter year of birth\n'))
       month1 = int(input('Enter month of birt\n'))
       day1 = int(input('Enter day of birth\n'))
-      while month1>13 or month1<1 or day1>31 or day1<0:
+      while month1>13 or month1<=0 or day1>=31 or day1<=0:
         print("There is an error with the dates.Please type again.")
         month1 = int(input('Enter month of birt\n'))
         day1 = int(input('Enter day of birth\n'))
@@ -97,7 +105,6 @@ while True:
         print("The Id for main customer is not in the database. Please select an id that's correct")
       else:
         print("There was an unexpected error")
-
   ## Add a new Position
   elif (a == '2'):
     try:
@@ -128,7 +135,6 @@ while True:
         print("The Position's id you choose is already in the system")
       else:
         print("There was an unexpected error")
-
   ## Add a new Booking
   elif (a == '3'):
     try:
@@ -186,10 +192,6 @@ while True:
       totalcost3 = float(input("Enter total cost of Booking\n"))
 ### Condition
       condition3 = 'Active'
-
-
-      Type3 = "Annual"
-
       year33 = int(input('Enter year of booking\n'))
       month33 = int(input('Enter month of booking\n'))
       day33 = int(input('Enter day of booking\n'))
@@ -200,13 +202,13 @@ while True:
       date33 = datetime.date(year33, month33, day33)
       BookingDate3 =date33.strftime('%Y-%m-%d')
 
-      val3 = (id3, custId3, posId3, arrival3, departure3, advance3, totalcost3, condition3, Type3, BookingDate3)
+      val3 = (id3, custId3, posId3, arrival3, departure3, advance3, totalcost3, condition3, BookingDate3)
       print("Are you sure you want to add to bookings the following:\n", val3, "if so type yes.")
       add3 = input()
       if add3 in ["YES", "Yes", "yes"]:
         query33 = "INSERT INTO  Booking(Id,`Customer Id`, `Position Id`,`Due date of arrival` ," \
-                  "`Due date of departure`,Advance,`Total Cost`, `Condition`,`Type`,`Booking Date`)" \
-                  "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                  "`Due date of departure`,Advance,`Total Cost`, `Condition`,`Booking Date`)" \
+                  "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 
         cursor.execute(query33, val3)
         mydb.commit()
@@ -231,7 +233,6 @@ while True:
         print("The Arrival date can't be after the departure date")
     except ArrivalAfterDeparture:
       print("The Arrival date can't be after the departure date")
-
   ## Check In
   elif (a == '4'):
     try:
@@ -275,7 +276,6 @@ while True:
         print("Operation Interupted ")
     except mysql.connector.Error as error:
       print("Something went wrong: {} \n".format(error))
-
   ## Show Current Customers On Camping
   elif (a == '5'):
     query5="select `Position Id`, `Customers Id`,`Arrival Date`, `Due date of departure`, `Full name`,`Phone number`,`ADT` " \
@@ -285,7 +285,7 @@ while True:
 
     cursor.execute(query5)
     result5= cursor.fetchall()
-    print(result5)
+
     firstrow5=[("Position's Id", "Customer's Id", "Arrival Date"," Departure Date"," Full Name","Phone Number","Social Security Number")]
     create_csv(result5,firstrow5)
     showcsv("file.csv")
@@ -295,7 +295,6 @@ while True:
            "WHERE `Due date of arrival`>curdate();"
     cursor.execute(query6)
     result6 = cursor.fetchall()
-    print(result6)
     firstrow6 = [("Id", "Customer's Id", "Position's Id", " Date of Arranged Arrival", " Date of Departure", "Advance",
                   "Total Cost","Condition", "Type","Booking Date")]
     create_csv(result6, firstrow6)
@@ -305,7 +304,7 @@ while True:
     query="SELECT * FROM Customers"
     cursor.execute(query)
     result = cursor.fetchall()
-    print(result)
+
     firstrow = [('Id', 'Full Name', 'ResId', 'Phone Number', 'Birthdate', 'ADT', 'Cost per Day', 'Total Cost')]
     create_csv(result,firstrow)
     showcsv("file.csv")
@@ -314,18 +313,50 @@ while True:
     query = "SELECT * FROM Booking"
     cursor.execute(query)
     result = cursor.fetchall()
-    print(result)
     firstrow = [('Id', "Customer's Id", "Position's Id", 'Due Date of Arrival', 'Due Date of Departure', 'Advance', 'Total Cost', 'Condition','Type','Booking Date')]
     create_csv(result, firstrow)
     showcsv("file.csv")
   ## Show All Available Positions
   elif (a == '9'):
-    print(a)
-
+    query = "SELECT  p.id, p.Type FROM Position p " \
+            "WHERE p.id NOT IN (" \
+            "SELECT Position.id FROM Position LEFT JOIN Booking b ON Position.`id`=b.`Position Id`LEFT JOIN CheckIn c ON p.`id`=c.`Position Id`" \
+            "WHERE (current_date()<b.`Due date of departure` or current_date()>b.`Due date of arrival`) or  current_date()<c.`Due date of departure`)"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    firstrow = [('Position Id', 'Type')]
+    create_csv(result, firstrow)
+    showcsv("file.csv")
+  ##Cancel a Booking
+  elif ( a== '10'):
+    print("Please choose the book you want to cancel:\n")
+    query101 = "SELECT Id FROM Booking where `Condition`!= 'Canceled'"
+    cursor.execute(query101)
+    result101 = cursor.fetchall()
+    for x in result101:
+      print("Customer's Id: {}\n".format(x[0]))
+    canceledId = int(input("Please Choose:\n"))
+    cursor.execute("update Booking set `Condition`='Canceled' where id=%s;", (canceledId,))
+    mydb.commit()
+    if canceledId in result101:
+      print("Booking has been canceled")
+    else:
+      print("The Id you choose is not correct")
+  ##Customer Search By Name
+  elif(a == '11'):
+    print("Please enter the full name of the customer you want\n")
+    name11=input()
+    query111 = "SELECT `Full Name` from Customers"
+    cursor.execute(query111)
+    result111 = cursor.fetchall()
+    cursor.execute("select * from Customers where `Full name`=%s;", (name11,))
+    result112 = cursor.fetchall()
+    firstrow = [('Id', 'Full Name', 'ResId', 'Phone Number', 'Birthdate', 'ADT', 'Cost per Day', 'Total Cost')]
+    create_csv(result112, firstrow)
+    showcsv("file.csv")
   else:
     print("Please choose again\n")
 
 
-cursor.close()
-mydb.close()
+
 

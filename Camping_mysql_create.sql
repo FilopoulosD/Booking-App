@@ -13,7 +13,6 @@ CREATE TABLE `Booking` (
     `Advance` INT(10),
     `Total Cost` INT(10),
     `Condition` VARCHAR(10) ,
-	`Type` VARCHAR(10),
 	`Booking Date` DATE,
     PRIMARY KEY (`Id`)
 );
@@ -48,13 +47,13 @@ CREATE TABLE `CheckIn` (
 	`Due date of departure` DATE NOT NULL
 );
 
-ALTER TABLE `Customers` ADD CONSTRAINT `Customers_fk0` FOREIGN KEY (`ResId`) REFERENCES `Customers`(`Id`);
+ALTER TABLE `Customers` ADD CONSTRAINT `Customers_fk0` FOREIGN KEY (`ResId`) REFERENCES `Customers`(`Id`) ON DELETE CASCADE ;
 
-ALTER TABLE `Booking` ADD CONSTRAINT `Booking_fk0` FOREIGN KEY (`Customer Id`) REFERENCES `Customers`(`Id`);
+ALTER TABLE `Booking` ADD CONSTRAINT `Booking_fk0` FOREIGN KEY (`Customer Id`) REFERENCES `Customers`(`Id`) ON DELETE CASCADE;
 
-ALTER TABLE `Booking` ADD CONSTRAINT `Booking_fk1` FOREIGN KEY (`Position Id`) REFERENCES `Position`(`Id`);
+ALTER TABLE `Booking` ADD CONSTRAINT `Booking_fk1` FOREIGN KEY (`Position Id`) REFERENCES `Position`(`Id`) ON DELETE CASCADE;
 
-ALTER TABLE `CheckIn` ADD CONSTRAINT `CheckIn_fk0` FOREIGN KEY (`Booking Id`) REFERENCES `Booking`(`Id`);
+ALTER TABLE `CheckIn` ADD CONSTRAINT `CheckIn_fk0` FOREIGN KEY (`Booking Id`) REFERENCES `Booking`(`Id`) ON DELETE CASCADE;
 
 
 
