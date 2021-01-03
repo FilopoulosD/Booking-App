@@ -14,6 +14,8 @@ CREATE TABLE `Booking` (
     `Total Cost` INT(10),
     `Condition` VARCHAR(10) ,
 	`Booking Date` DATE,
+	`Adults`    INT(10),
+	`Underage`INT(10),
     PRIMARY KEY (`Id`)
 );
 
