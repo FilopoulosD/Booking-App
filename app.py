@@ -28,7 +28,7 @@ while True:
     cursor = mydb.cursor()
     print("Select Action:\n1)Add a new Customer\n2)Add a new Position\n3)Add a new Booking\n4)Check In\n"
           "5)Show Current Customers On Camping\n6)Show Future Arrivals\n7)Show All Customers\n8)Show All Bookings\n"
-          "9)Show  Available Positions\n10)Cancel a Booking\n11)Search A Customer By Name\n12)Check Out20)Exit")
+          "9)Show  Available Positions\n10)Cancel a Booking\n11)Search A Customer By Name\n12)Check Out\n20)Exit")
 
     a = input()
 
@@ -82,7 +82,10 @@ while True:
             cpd1=float(input("Give cost per day\n"))
             tc1=0
             val1=(id1,name1,resId1,phone1,formatted_date1,adt1,cpd1,tc1)
-            print("Are you sure you want to add to customers the following:\n",val1, "\nIf so type yes.")
+            print("Are you sure you want to add to positions the following:\nCustomer's Id: "
+                  , id1, "\nCustomer's Name: ", name1, "\nResponsible customer's Id: ", resId1, "\nPhone Number: "
+                  , phone1, "\nDate of Birth: ", formatted_date1, "\nADT: "
+                  , adt1, "\nCost Per Day: ", cpd1,"Total Cost: ",tc1,"\nIf so enter yes")
             add1=input()
             if add1 in ["YES","Yes","yes"]:
 
@@ -116,7 +119,10 @@ while True:
             annual2 = input("Give position's status for annual rent\n")
             maxnum2 = int(input("Give position's max number\n"))
             val2 = (id2, type2, usagecost2, electricity2, wifi2, annual2, maxnum2)
-            print("Are you sure you want to add to positions the following:\n",val2, "\nif so type yes.")
+            print("Are you sure you want to add to positions the following:\nPosition's Id: "
+                  ,id2, "\nPosition's Type:", type2, "\nUsage Cost: ", usagecost2,"\nElectricity: "
+                  , electricity2,"\nWifi: ", wifi2,"\nAvailability for annual rental"
+                  , annual2, "\nMax number:", maxnum2,"\nIf so enter yes" )
             add2 = input()
             if add2 in ["YES", "Yes", "yes"]:
                 query2 = "INSERT INTO Position (Id,Type,`Usage Cost`,Electricity,Wifi,`Available for annual book`,`Max number`)" \
@@ -363,7 +369,25 @@ while True:
         showcsv("file.csv")
     ### Check Out
     elif(a == '12'):
-        print(a)
+            ##Position's Id
+            query121 = "SELECT `Position Id` FROM `CheckIn`"
+            cursor.execute(query121)
+            result121 = cursor.fetchall()
+            print("Choose a position's Id from the following\n")
+            for x in result121:
+                print("Position's Id: {}\n".format(x[0]))
+            posId12 = int(input("Give position's Id:\n"))
+            ##Customer's Id
+            query122 = "SELECT `Customers Id` FROM `CheckIn`"
+            cursor.execute(query122)
+            result122 = cursor.fetchall()
+            print("Choose a position's Id from the following\n")
+            for x in result122:
+                print("Position's Id: {}\n".format(x[0]))
+            cusId12 = int(input("Give position's Id:\n"))
+
+            cursor.execute("DELETE FROM `CheckIn` WHERE `Position Id`=%s AND `Customers Id`=%s", (posId12,cusId12,))
+            mydb.commit()
     else:
         print("Please choose again\n")
 
