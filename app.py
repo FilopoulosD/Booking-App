@@ -214,8 +214,7 @@ while True:
             else:
                 wifi = 0
 
-            totalcost3 = totaldays.days * result33[0][0] * result33[0][
-                3] + adults * totaldays.days * 5 + children * totaldays.days * 3 + totaldays.days * electr + totaldays.days * wifi
+            totalcost3 = totaldays.days * result33[0][0] + adults * totaldays.days * 5 + children * totaldays.days * 3 + totaldays.days * electr + totaldays.days * wifi
 
             print("Total Cost is: ", totalcost3)
             ### Advance
