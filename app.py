@@ -195,15 +195,29 @@ while True:
                     print("The Arrival date is after Departure. Please Give again the correct dates")
             ### Number of Adults
             print("Please give the number of adults")
-            adults=int(input())
+            adults = int(input())
             ### Number of Children
             print("Please give the number of Children")
             children = int(input())
             ### Total Cost
-            cursor.execute("select `Max Number` from Position where `id`=%s;", (posId3,))
+            cursor.execute("select `Usage Cost`,`Electricity`,`Wifi`, `Max Number` from Position where `id`=%s;",
+                           (posId3,))
             result33 = cursor.fetchall()
             totaldays = date32 - date31
-            totalcost3 = totaldays.days * adults * 5 + totaldays.days * children * 3 + result33[0][0] * totaldays.days * 10
+            if result33[0][1] in ["YES", "Yes", "yes"]:
+                electr = 2
+            else:
+                electr = 0
+
+            if result33[0][2] in ["YES", "Yes", "yes"]:
+                wifi = 3
+            else:
+                wifi = 0
+
+            totalcost3 = totaldays.days * result33[0][0] * result33[0][
+                3] + adults * totaldays.days * 5 + children * totaldays.days * 3 + totaldays.days * electr + totaldays.days * wifi
+
+            print("Total Cost is: ", totalcost3)
             ### Advance
             advance3 = float(input("Enter advance (if there is not please enter 0)\n"))
             ### Condition
@@ -215,11 +229,16 @@ while True:
             while month33 > 13 or month33 < 1 or day33 > 31 or day33 < 0:
                 print("There is an error with the dates.Please type again.")
                 month33 = int(input('Enter month of birt\n'))
-                day33= int(input('Enter day of birth\n'))
+                day33 = int(input('Enter day of birth\n'))
             date33 = datetime.date(year33, month33, day33)
-            BookingDate3 =date33.strftime('%Y-%m-%d')
-            val3 = (id3, custId3, posId3, arrival3, departure3, advance3, totalcost3, condition3, BookingDate3, adults,children)
-            print("Are you sure you want to add to bookings the following:\n", val3, "if so type yes.")
+            BookingDate3 = date33.strftime('%Y-%m-%d')
+            val3 = (id3, custId3, posId3, arrival3, departure3, advance3, totalcost3, condition3, BookingDate3, adults,
+                    children)
+            print("Are you sure you want to add to positions the following:\nBooking's Id: "
+                  , id3, "\nCustomer's Id:", custId3, "\nPosition's Id: ", posId3, "\nArrival: "
+                  , arrival3, "\nDeparture: ", departure3, "\nAdvance: "
+                  , advance3, "\nTotal Cost:", totalcost3, "\nBooking Date: ", BookingDate3, "\nNumber of Adults: ",
+                  adults, "\nNumber of Children: ", children, "\nIf so enter yes")
             add3 = input()
             if add3 in ["YES", "Yes", "yes"]:
                 query33 = "INSERT INTO  Booking(Id,`Customer Id`, `Position Id`,`Due date of arrival` ," \
@@ -237,12 +256,14 @@ while True:
         except mysql.connector.Error as error:
             print("Something went wrong: {} \n".format(error))
 
-            if error.errno == 1452 :
+            if error.errno == 1452:
 
                 if 'REFERENCES `Customers` (`Id`)' in error.msg:
-                    print("There was a problem with the customer's id. Please choose an id that exists on the database\n")
+                    print(
+                        "There was a problem with the customer's id. Please choose an id that exists on the database\n")
                 elif 'REFERENCES `Position` (`Id`)' in error.msg:
-                    print("There was a problem with thw position's id. Please choose an id that exists on the database\n")
+                    print(
+                        "There was a problem with thw position's id. Please choose an id that exists on the database\n")
             elif error.errno == 1062:
                 print("The Booking's id you choose is already in the system")
             elif ArrivalAfterDeparture:
@@ -281,7 +302,9 @@ while True:
             BookingDate4 = date4.strftime('%Y-%m-%d')
 
             val4=(posId4,custId4,arrival4,BookingDate4)
-            print("Are you sure you want to add to check ins the following:\n", val4, "if so type yes.")
+            print("Are you sure you want to add to Check Ins the following:\nPosition's Id: "
+                  , posId4, "\nCustomer's Id:", custId4, "\nArrival: ", arrival4, "\nBooking Date: "
+                  , BookingDate4,"\nIf so enter yes")
             add4 = input()
             if add4 in ["YES", "Yes", "yes"]:
                 query43 = "INSERT INTO CheckIn(`Position Id`,`Customers Id`,`Arrival Date`,`Due date of departure`) VALUES (%s,%s,%s,%s)"
@@ -388,6 +411,10 @@ while True:
 
             cursor.execute("DELETE FROM `CheckIn` WHERE `Position Id`=%s AND `Customers Id`=%s", (posId12,cusId12,))
             mydb.commit()
+    ### Calculate the total cost of all the bookings of a specific customer
+    elif(a == '13'):
+        print(a)
+
     else:
         print("Please choose again\n")
 
