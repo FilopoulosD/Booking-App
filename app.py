@@ -14,10 +14,15 @@ class CustomError (Exception) :
     pass
 
 
+class AllPositionsBooked(CustomError):
+    pass
+
 class ArrivalAfterDeparture(CustomError):
     """Raised when the arrival is after the departure"""
     pass
 
+class PositionsNotCorrect(CustomError):
+    pass
 
 
 today = date.today()
@@ -27,7 +32,7 @@ while True:
 
     cursor = mydb.cursor()
     print("Select Action:\n1)Add a new Customer\n2)Add a new Position\n3)Add a new Booking\n4)Check In\n"
-          "5)Show Current Customers On Camping\n6)Show Future Arrivals\n7)Show All Customers\n8)Show All Bookings\n"
+          "5)Show Current Customers On Camping\n6)Show Future Arrivals\n7)Show All Customers\n8)Show All Bookings Between two Dates\n"
           "9)Show  Available Positions\n10)Cancel a Booking\n11)Search A Customer By Name\n12)Check Out\n13)Find the Total Cost of a Customer\n14)Exit")
 
     a = input()
@@ -118,15 +123,15 @@ while True:
             wifi2 = input("Give position's status for wifi\n")
             annual2 = input("Give position's status for annual rent\n")
             maxnum2 = int(input("Give position's max number\n"))
-            val2 = (id2, type2, usagecost2, electricity2, wifi2, annual2, maxnum2)
+            val2 = (id2, type2, usagecost2, electricity2, wifi2, maxnum2)
             print("Are you sure you want to add to positions the following:\nPosition's Id: "
                   ,id2, "\nPosition's Type:", type2, "\nUsage Cost: ", usagecost2,"\nElectricity: "
                   , electricity2,"\nWifi: ", wifi2,"\nAvailability for annual rental"
                   , annual2, "\nMax number:", maxnum2,"\nIf so enter yes" )
             add2 = input()
             if add2 in ["YES", "Yes", "yes"]:
-                query2 = "INSERT INTO Position (Id,Type,`Usage Cost`,Electricity,Wifi,`Available for annual book`,`Max number`)" \
-                         "VALUES (%s,%s,%s,%s,%s,%s,%s);"
+                query2 = "INSERT INTO Position (Id,Type,`Usage Cost`,Electricity,Wifi,`Max number`)" \
+                         "VALUES (%s,%s,%s,%s,%s,%s);"
                 cursor.execute(query2, val2)
                 mydb.commit()
                 print("A new position was added to the database")
@@ -145,24 +150,14 @@ while True:
     elif (a == '3'):
         try:
             id3 = int(input("Give Booking's Id:\n"))
-
             ### Customer's Id
-            query31 = "SELECT Id FROM Customers "
+            query31 = "SELECT Id FROM Customers ORDER BY Id"
             cursor.execute(query31)
             result31 = cursor.fetchall()
             print("Choose a customers Id from the following\n")
             for x in result31:
                 print("Customer's Id: {}\n".format(x[0]))
             custId3 = int(input("Give customers's Id:\n"))
-
-            ### Positions Id
-            query32 = "SELECT Id FROM Position"
-            cursor.execute(query32)
-            result32 = cursor.fetchall()
-            print("Choose a position's Id from the following\n")
-            for x in result32:
-                print("Position's Id: {}\n".format(x[0]))
-            posId3 = int(input("Give position's Id:\n"))
             ### Check if arrival is before departure
             while True:
                 try:
@@ -170,19 +165,19 @@ while True:
                     year31 = int(input('Enter arranged year of arrival\n'))
                     month31 = int(input('Enter arranged month of arrival\n'))
                     day31 = int(input('Enter arranged day of arrival\n'))
-                    while month31 > 13 or month31 < 1 or day31 > 31 or day31 < 0:
+                    while month31 > 13 or month31 < 1 or day31 > 31 or day31 < 1:
                         print("There is an error with the dates.Please type again.")
-                        month31 = int(input('Enter month of birt\n'))
-                        day31 = int(input('Enter day of birth\n'))
+                        month31 = int(input('Enter month of arrival\n'))
+                        day31 = int(input('Enter day of arrival\n'))
                     date31 = datetime.date(year31, month31, day31)
                     ### Departure
                     year32 = int(input('Enter arranged year of departure\n'))
                     month32 = int(input('Enter arranged month of departure\n'))
                     day32 = int(input('Enter arranged day of departure\n'))
-                    while month32 > 13 or month32 < 1 or day32 > 31 or day32 < 0:
+                    while month32 > 13 or month32 < 1 or day32 > 31 or day32 < 1:
                         print("There is an error with the dates.Please type again.")
-                        month32 = int(input('Enter month of birt\n'))
-                        day32 = int(input('Enter day of birth\n'))
+                        month32 = int(input('Enter month of departure\n'))
+                        day32 = int(input('Enter day of departure\n'))
                     date32 = datetime.date(year32, month32, day32)
 
                     arrival3 = date31.strftime('%Y-%m-%d')
@@ -193,70 +188,98 @@ while True:
                         break
                 except ArrivalAfterDeparture:
                     print("The Arrival date is after Departure. Please Give again the correct dates")
-            ### Number of Adults
-            print("Please give the number of adults")
-            adults = int(input())
-            ### Number of Children
-            print("Please give the number of Children")
-            children = int(input())
-            ### Total Cost
-            cursor.execute("select `Usage Cost`,`Electricity`,`Wifi`, `Max Number` from Position where `id`=%s;",
-                           (posId3,))
-            result33 = cursor.fetchall()
-            totaldays = date32 - date31
-            if result33[0][1] in ["YES", "Yes", "yes"]:
-                electr = 2
-            else:
-                electr = 0
+            ### Position's Id
+            try:
+                cursor.execute("SELECT DISTINCT p.id,p.Type,p.`Max number`  FROM Position p WHERE p.id   NOT IN "
+                               "(SELECT Position.id FROM Position LEFT JOIN Booking  ON Position.id=Booking.`Position Id` "
+                               "WHERE   (%s>=Booking.`Due date of arrival` and %s<Booking.`Due date of departure`) "
+                               "or (%s>Booking.`Due date of arrival` and %s<Booking.`Due date of departure`) "
+                               "or (%s<Booking.`Due date of arrival` and %s>=Booking.`Due date of departure`)) ",
+                               (date31, date31, date32, date32, date31, date32,))
 
-            if result33[0][2] in ["YES", "Yes", "yes"]:
-                wifi = 3
-            else:
-                wifi = 0
+                result3a = cursor.fetchall()
+                if len(result3a) == 0:
+                    print("The are not empty positions for the selected dates")
+                    raise AllPositionsBooked
+                else:
+                    print(result3a)
+                    print("Choose a customers Id from the following\n")
+                    for x1 in result3a:
+                        print("Position's Id: {}".format(x1[0]))
+                        print("Position's Type: {}".format(x1[1]))
+                        print("Position's Max Number: {}\n".format(x1[2]))
 
-            totalcost3 = totaldays.days * result33[0][0] + adults * totaldays.days * 5 + children * totaldays.days * 3 + totaldays.days * electr + totaldays.days * wifi
+                    posId3 = int(input("Give position's Id\n"))
+                    var3 = 0
+                    for x2 in result3a:
+                        if (posId3 == x2[0]):
+                            var3 = 1
 
-            print("Total Cost is: ", totalcost3)
-            ### Advance
-            advance3 = float(input("Enter advance (if there is not please enter 0)\n"))
-            ### Condition
-            condition3 = 'Active'
-            ### Booking Date
-            year33 = int(input('Enter year of booking\n'))
-            month33 = int(input('Enter month of booking\n'))
-            day33 = int(input('Enter day of booking\n'))
-            while month33 > 13 or month33 < 1 or day33 > 31 or day33 < 0:
-                print("There is an error with the dates.Please type again.")
-                month33 = int(input('Enter month of birt\n'))
-                day33 = int(input('Enter day of birth\n'))
-            date33 = datetime.date(year33, month33, day33)
-            BookingDate3 = date33.strftime('%Y-%m-%d')
-            val3 = (id3, custId3, posId3, arrival3, departure3, advance3, totalcost3, condition3, BookingDate3, adults,
-                    children)
-            print("Are you sure you want to add to positions the following:\nBooking's Id: "
-                  , id3, "\nCustomer's Id:", custId3, "\nPosition's Id: ", posId3, "\nArrival: "
-                  , arrival3, "\nDeparture: ", departure3, "\nAdvance: "
-                  , advance3, "\nTotal Cost:", totalcost3, "\nBooking Date: ", BookingDate3, "\nNumber of Adults: ",
-                  adults, "\nNumber of Children: ", children, "\nIf so enter yes")
-            add3 = input()
-            if add3 in ["YES", "Yes", "yes"]:
-                query33 = "INSERT INTO  Booking(Id,`Customer Id`, `Position Id`,`Due date of arrival` ," \
-                          "`Due date of departure`,Advance,`Total Cost`, `Condition`,`Booking Date`,`Adults`,`Underage`)" \
-                          "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                    ### Number of Adults
+                    print("Please give the number of adults")
+                    adults = int(input())
+                    ### Number of Children
+                    print("Please give the number of Children")
+                    children = int(input())
+                    ### Total Cost
+                    cursor.execute(
+                        "select `Usage Cost`,`Electricity`,`Wifi`, `Max Number` from Position where `id`=%s;",
+                        (posId3,))
+                    result33 = cursor.fetchall()
+                    totaldays = date32 - date31
+                    if result33[0][1] in ["YES", "Yes", "yes"]:
+                        electr = 2
+                    else:
+                        electr = 0
 
-                cursor.execute(query33, val3)
-                mydb.commit()
-                print("A new booking was added to the database")
-            else:
-                print("Operation Interupted ")
+                    if result33[0][2] in ["YES", "Yes", "yes"]:
+                        wifi = 3
+                    else:
+                        wifi = 0
 
+                    totalcost3 = totaldays.days * result33[0][
+                        0] + adults * totaldays.days * 5 + children * totaldays.days * 3 + totaldays.days * electr + totaldays.days * wifi
 
-        ### Handle errors
+                    print("Total Cost is: ", totalcost3)
+                    ### Advance
+                    advance3 = float(input("Enter advance (if there is not please enter 0)\n"))
+                    ### Booking Date
+                    year33 = int(input('Enter year of booking\n'))
+                    month33 = int(input('Enter month of booking\n'))
+                    day33 = int(input('Enter day of booking\n'))
+                    while month33 > 13 or month33 < 1 or day33 > 31 or day33 < 0:
+                        print("There is an error with the dates.Please type again.")
+                        month33 = int(input('Enter month of birt\n'))
+                        day33 = int(input('Enter day of birth\n'))
+                    date33 = datetime.date(year33, month33, day33)
+                    BookingDate3 = date33.strftime('%Y-%m-%d')
+                    if (var3 == 1):
+                        val3 = (id3, custId3, posId3, date31, date32, advance3, totalcost3, today, adults, children)
+
+                        print("Are you sure you want to add to positions the following:\nBooking's Id: "
+                              , id3, "\nCustomer's Id:", custId3, "\nPosition's Id: ", posId3, "\nArrival: "
+                              , arrival3, "\nDeparture: ", departure3, "\nAdvance: "
+                              , advance3, "\nTotal Cost:", totalcost3, "\nBooking Date: ", BookingDate3,
+                              "\nNumber of Adults: ",
+                              adults, "\nNumber of Children: ", children, "\nIf so enter yes")
+                        add3 = input()
+                        if add3 in ["YES", "Yes", "yes"]:
+                            query33 = "INSERT INTO  Booking(Id,`Customer Id`, `Position Id`,`Due date of arrival` ," \
+                                      "`Due date of departure`,Advance,`Total Cost`,`Booking Date`,`Adult`,`Underage`)" \
+                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+
+                            cursor.execute(query33, val3)
+                            mydb.commit()
+                            print("A new booking was added to the database")
+                        else:
+                            print("Operation Interupted ")
+                    else:
+                        raise PositionsNotCorrect
+            except PositionsNotCorrect:
+                print("The Position you gave is not correct")
         except mysql.connector.Error as error:
             print("Something went wrong: {} \n".format(error))
-
             if error.errno == 1452:
-
                 if 'REFERENCES `Customers` (`Id`)' in error.msg:
                     print(
                         "There was a problem with the customer's id. Please choose an id that exists on the database\n")
@@ -346,12 +369,31 @@ while True:
         firstrow = [('Id', 'Full Name', 'ResId', 'Phone Number', 'Birthdate', 'ADT', 'Cost per Day', 'Total Cost')]
         create_csv(result,firstrow)
         showcsv("file.csv")
-    ## Show All Bookings
+    ## Show All Bookings Between 2 Dates
     elif (a == '8'):
-        query = "SELECT * FROM Booking"
-        cursor.execute(query)
+        year81 = int(input('Enter arranged year of arrival\n'))
+        month81 = int(input('Enter arranged month of arrival\n'))
+        day81 = int(input('Enter arranged day of arrival\n'))
+        while month81 > 13 or month81 < 1 or day81 > 31 or day81 < 1:
+            print("There is an error with the dates.Please type again.")
+            month81 = int(input('Enter month of arrival\n'))
+            day81 = int(input('Enter day of arrival\n'))
+        date81 = datetime.date(year81, month81, day81)
+
+        year82 = int(input('Enter arranged year of departure\n'))
+        month82 = int(input('Enter arranged month of departure\n'))
+        day82 = int(input('Enter arranged day of departure\n'))
+        while month82 > 13 or month82 < 1 or day82 > 31 or day82 < 1:
+            print("There is an error with the dates.Please type again.")
+            month82 = int(input('Enter month of departure\n'))
+            day82 = int(input('Enter day of departure\n'))
+        date82 = datetime.date(year82, month82, day82)
+
+        cursor.execute("SELECT * FROM Booking WHERE %s<`Due date of departure` and %s>`Due date of arrival`",
+                       (date81, date82))
         result = cursor.fetchall()
-        firstrow = [('Id', "Customer's Id", "Position's Id", 'Due Date of Arrival', 'Due Date of Departure', 'Advance', 'Total Cost', 'Condition','Type','Booking Date')]
+        firstrow = [('Id', 'Customer Id', 'Position Id', 'Due date of arrival', 'Due date of departure',
+                     'Advance', 'Total Cost', 'Condition', 'Booking Date', 'Adults', 'Children')]
         create_csv(result, firstrow)
         showcsv("file.csv")
     ## Show All Available Positions
