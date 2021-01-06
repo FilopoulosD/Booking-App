@@ -28,7 +28,7 @@ while True:
     cursor = mydb.cursor()
     print("Select Action:\n1)Add a new Customer\n2)Add a new Position\n3)Add a new Booking\n4)Check In\n"
           "5)Show Current Customers On Camping\n6)Show Future Arrivals\n7)Show All Customers\n8)Show All Bookings\n"
-          "9)Show  Available Positions\n10)Cancel a Booking\n11)Search A Customer By Name\n12)Check Out\n20)Exit")
+          "9)Show  Available Positions\n10)Cancel a Booking\n11)Search A Customer By Name\n12)Check Out\n13)Find the Total Cost of a Customer\n20)Exit")
 
     a = input()
 
