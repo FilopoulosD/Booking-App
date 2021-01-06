@@ -10,7 +10,7 @@ import mysql.connector
 
 mydb = mysql.connector.connect(
   host="NameOfHost",
-  user="NameOfRoot",
+  user="NameOfUser",
   database="NameOfDatabase",
   password="YourPassword"
 )
