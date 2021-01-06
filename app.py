@@ -147,7 +147,7 @@ while True:
             id3 = int(input("Give Booking's Id:\n"))
 
             ### Customer's Id
-            query31 = "SELECT Id FROM Customers"
+            query31 = "SELECT Id FROM Customers "
             cursor.execute(query31)
             result31 = cursor.fetchall()
             print("Choose a customers Id from the following\n")
@@ -412,8 +412,15 @@ while True:
             mydb.commit()
     ### Calculate the total cost of all the bookings of a specific customer
     elif(a == '13'):
-        print(a)
-
+        custId13=input("Please give the customer's Id: \n")
+        cursor.execute("SELECT `Total Cost` FROM `Booking` WHERE `Customer Id`=%s",(custId13,))
+        result13=cursor.fetchall()
+        totalcost13=0
+        for i in range(len(result13)):
+            totalcost13=totalcost13 + result13[i][0]
+        cursor.execute("UPDATE `Customers` SET `Total Cost`=%s WHERE Id=%s", (totalcost13, custId13,))
+        print("The total cost is: ", totalcost13)
+        mydb.commit()
     else:
         print("Please choose again\n")
 
