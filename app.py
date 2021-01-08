@@ -321,13 +321,16 @@ while True:
                 cursor.execute("SELECT `Due date of departure` FROM Booking WHERE `Id`=%s", (bookId4,))
                 result42 = cursor.fetchall()
                 print("Departure Date is: {}".format(result42[0][0]))
+                cursor.execute("SELECT `Position Id` FROM Booking WHERE `Id`=%s", (bookId4,))
+                result43 = cursor.fetchall()
+
                 print("Are you sure you want to add to Check Ins the following:\nBooking's Id: "
                       , bookId4, "\nArrival: ", today, "\nDeparture Date: "
-                      , result42[0][0], "\nIf so enter yes")
+                      , result42[0][0], "\nPosition's Id: ", result43[0][0], "\nIf so enter yes")
                 add4 = input()
-                val4 = (bookId4, today, result42[0][0])
+                val4 = (bookId4, today, result42[0][0], result43[0][0])
                 if add4 in ["YES", "Yes", "yes"]:
-                    query43 = "INSERT INTO Checkin(`Booking Id`, `Arrival Date`,`Due date of departure`) VALUES (%s,%s,%s)"
+                    query43 = "INSERT INTO Checkin(`Booking Id`, `Arrival Date`,`Due date of departure`,`Position Id`) VALUES (%s,%s,%s,%s)"
                     cursor.execute(query43, val4)
                     mydb.commit()
                     print("A new check in was added to the database")
@@ -337,6 +340,7 @@ while True:
                 print("Booking already Checked in")
         except mysql.connector.Error as error:
             print("Something went wrong: {} \n".format(error))
+
     ## Show Current Customers On Camping
     elif (a == '5'):
         query5 = "select `Booking Id`,`Position Id`, `Customer Id`,`Arrival Date`, " \
