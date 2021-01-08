@@ -187,90 +187,93 @@ while True:
                     print("The Arrival date is after Departure. Please Give again the correct dates")
             ### Position's Id
             try:
-                cursor.execute("SELECT DISTINCT p.id,p.Type,p.`Max number`  FROM Position p WHERE p.id   NOT IN "
-                               "(SELECT Position.id FROM Position LEFT JOIN Booking  ON Position.id=Booking.`Position Id` "
-                               "WHERE   (%s>=Booking.`Due date of arrival` and %s<Booking.`Due date of departure`) "
-                               "or (%s>Booking.`Due date of arrival` and %s<Booking.`Due date of departure`) "
-                               "or (%s<Booking.`Due date of arrival` and %s>=Booking.`Due date of departure`)) ",
-                               (date31, date31, date32, date32, date31, date32,))
+                try:
+                    cursor.execute("SELECT DISTINCT p.id,p.Type,p.`Max number`  FROM Position p WHERE p.id   NOT IN "
+                                   "(SELECT Position.id FROM Position LEFT JOIN Booking  ON Position.id=Booking.`Position Id` "
+                                   "WHERE   (%s>=Booking.`Due date of arrival` and %s<Booking.`Due date of departure`) "
+                                   "or (%s>Booking.`Due date of arrival` and %s<Booking.`Due date of departure`) "
+                                   "or (%s<Booking.`Due date of arrival` and %s>=Booking.`Due date of departure`)) ",
+                                   (date31, date31, date32, date32, date31, date32,))
 
-                result3a = cursor.fetchall()
-                if len(result3a) == 0:
-                    print("The are not empty positions for the selected dates")
-                    raise AllPositionsBooked
-                else:
-                    print(result3a)
-                    print("Choose a customers Id from the following\n")
-                    for x1 in result3a:
-                        print("Position's Id: {}".format(x1[0]))
-                        print("Position's Type: {}".format(x1[1]))
-                        print("Position's Max Number: {}\n".format(x1[2]))
-
-                    posId3 = int(input("Give position's Id\n"))
-
-                    var3 = 0
-                    for x2 in result3a:
-                        if (posId3 == x2[0]):
-                            var3 = 1
-                    if (var3 == 1):
-                        ### Number of Adults
-                        print("Please give the number of adults")
-                        adults = int(input())
-                        ### Number of Children
-                        print("Please give the number of Children")
-                        children = int(input())
-                        ### Total Cost
-                        cursor.execute("select `Usage Cost`,`Electricity`,`Wifi`, `Max Number` from Position where `id`=%s;",(posId3,))
-                        result33 = cursor.fetchall()
-                        totaldays = date32 - date31
-                        if result33[0][1] in ["YES", "Yes", "yes"]:
-                            electr = 2
-                        else:
-                            electr = 0
-
-                        if result33[0][2] in ["YES", "Yes", "yes"]:
-                            wifi = 3
-                        else:
-                            wifi = 0
-
-                        totalcost3 = totaldays.days * result33[0][
-                            0] + adults * totaldays.days * 5 + children * totaldays.days * 3 + totaldays.days * electr + totaldays.days * wifi
-
-                        print("Total Cost is: ", totalcost3)
-                        ### Advance
-                        advance3 = float(input("Enter advance (if there is not please enter 0)\n"))
-                        ### Booking Date
-                        year33 = int(input('Enter year of booking\n'))
-                        month33 = int(input('Enter month of booking\n'))
-                        day33 = int(input('Enter day of booking\n'))
-                        while month33 > 13 or month33 < 1 or day33 > 31 or day33 < 0:
-                            print("There is an error with the dates.Please type again.")
-                            month33 = int(input('Enter month of birt\n'))
-                            day33 = int(input('Enter day of birth\n'))
-                        date33 = datetime.date(year33, month33, day33)
-                        BookingDate3 = date33.strftime('%Y-%m-%d')
-
-                        val3 = (id3, custId3, posId3, date31, date32, advance3, totalcost3, today, adults, children)
-
-                        print("Are you sure you want to add to positions the following:\nBooking's Id: "
-                              , id3, "\nCustomer's Id:", custId3, "\nPosition's Id: ", posId3, "\nArrival: "
-                              , arrival3, "\nDeparture: ", departure3, "\nAdvance: "
-                              , advance3, "\nTotal Cost:", totalcost3, "\nBooking Date: ", BookingDate3,
-                              "\nNumber of Adults: ",
-                              adults, "\nNumber of Children: ", children, "\nIf so enter yes")
-                        add3 = input()
-                        if add3 in ["YES", "Yes", "yes"]:
-                            query33 = "INSERT INTO  Booking(Id,`Customer Id`, `Position Id`,`Due date of arrival` ," \
-                                      "`Due date of departure`,Advance,`Total Cost`,`Booking Date`,`Adult`,`Underage`)" \
-                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-
-                            cursor.execute(query33, val3)
-                            mydb.commit()
-                            print("A new booking was added to the database")
-                        else:
-                            print("Operation Interupted ")
+                    result3a = cursor.fetchall()
+                    if len(result3a) == 0:
+                        print("The are not empty positions for the selected dates")
+                        raise AllPositionsBooked
                     else:
-                        raise PositionsNotCorrect
+                        print(result3a)
+                        print("Choose a customers Id from the following\n")
+                        for x1 in result3a:
+                            print("Position's Id: {}".format(x1[0]))
+                            print("Position's Type: {}".format(x1[1]))
+                            print("Position's Max Number: {}\n".format(x1[2]))
+
+                        posId3 = int(input("Give position's Id\n"))
+
+                        var3 = 0
+                        for x2 in result3a:
+                            if (posId3 == x2[0]):
+                                var3 = 1
+                        if (var3 == 1):
+                            ### Number of Adults
+                            print("Please give the number of adults")
+                            adults = int(input())
+                            ### Number of Children
+                            print("Please give the number of Children")
+                            children = int(input())
+                            ### Total Cost
+                            cursor.execute("select `Usage Cost`,`Electricity`,`Wifi`, `Max Number` from Position where `id`=%s;",(posId3,))
+                            result33 = cursor.fetchall()
+                            totaldays = date32 - date31
+                            if result33[0][1] in ["YES", "Yes", "yes"]:
+                                electr = 2
+                            else:
+                                electr = 0
+
+                            if result33[0][2] in ["YES", "Yes", "yes"]:
+                                wifi = 3
+                            else:
+                                wifi = 0
+
+                            totalcost3 = totaldays.days * result33[0][
+                                0] + adults * totaldays.days * 5 + children * totaldays.days * 3 + totaldays.days * electr + totaldays.days * wifi
+
+                            print("Total Cost is: ", totalcost3)
+                            ### Advance
+                            advance3 = float(input("Enter advance (if there is not please enter 0)\n"))
+                            ### Booking Date
+                            year33 = int(input('Enter year of booking\n'))
+                            month33 = int(input('Enter month of booking\n'))
+                            day33 = int(input('Enter day of booking\n'))
+                            while month33 > 13 or month33 < 1 or day33 > 31 or day33 < 0:
+                                print("There is an error with the dates.Please type again.")
+                                month33 = int(input('Enter month of birt\n'))
+                                day33 = int(input('Enter day of birth\n'))
+                            date33 = datetime.date(year33, month33, day33)
+                            BookingDate3 = date33.strftime('%Y-%m-%d')
+
+                            val3 = (id3, custId3, posId3, date31, date32, advance3, totalcost3, today, adults, children)
+
+                            print("Are you sure you want to add to positions the following:\nBooking's Id: "
+                                  , id3, "\nCustomer's Id:", custId3, "\nPosition's Id: ", posId3, "\nArrival: "
+                                  , arrival3, "\nDeparture: ", departure3, "\nAdvance: "
+                                  , advance3, "\nTotal Cost:", totalcost3, "\nBooking Date: ", BookingDate3,
+                                  "\nNumber of Adults: ",
+                                  adults, "\nNumber of Children: ", children, "\nIf so enter yes")
+                            add3 = input()
+                            if add3 in ["YES", "Yes", "yes"]:
+                                query33 = "INSERT INTO  Booking(Id,`Customer Id`, `Position Id`,`Due date of arrival` ," \
+                                          "`Due date of departure`,Advance,`Total Cost`,`Booking Date`,`Adult`,`Underage`)" \
+                                          "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+
+                                cursor.execute(query33, val3)
+                                mydb.commit()
+                                print("A new booking was added to the database")
+                            else:
+                                print("Operation Interupted ")
+                        else:
+                            raise PositionsNotCorrect
+                except AllPositionsBooked:
+                    print("All position's are booked for that dates")
             except PositionsNotCorrect:
                 print("The Position you gave is not correct")
         except mysql.connector.Error as error:
@@ -413,7 +416,7 @@ while True:
     ##Delete a Booking
     elif ( a== '10'):
         print("Please choose the book you want to delete:\n")
-        query101 = "SELECT Id FROM Booking where `Condition`!= 'Canceled'"
+        query101 = "SELECT Id FROM Booking"
         cursor.execute(query101)
         result101 = cursor.fetchall()
         for x in result101:
