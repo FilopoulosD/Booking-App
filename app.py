@@ -415,7 +415,7 @@ while True:
         cursor.execute(query101)
         result101 = cursor.fetchall()
         for x in result101:
-            print("Customer's Id: {}\n".format(x[0]))
+            print("Booking's Id: {}\n".format(x[0]))
         canceledId = int(input("Please Choose:\n"))
         cursor.execute("DELETE FROM `Booking` where id=%s;", (canceledId,))
         mydb.commit()
