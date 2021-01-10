@@ -14,7 +14,7 @@ INSTALLATION GUIDE:
     csv
     os
     
-You can download mysql.connectro from this link: https://dev.mysql.com/downloads/connector/python/
+You can download mysql.connector from this link: https://dev.mysql.com/downloads/connector/python/
   Select your OS and install the library.
 
 The other libraries are included with every standar installat of Python. 		
