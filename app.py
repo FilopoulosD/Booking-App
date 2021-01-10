@@ -6,29 +6,36 @@ from createcsv import create_csv
 from tkinterShow import showcsv
 from DeleteFileCSV import delete
 
-
 mydb
 
 
-
-
-class CustomError (Exception) :
+class CustomError(Exception):
     pass
+
+
 class AllPositionsBooked(CustomError):
     pass
+
+
 class ArrivalAfterDeparture(CustomError):
     pass
+
+
 class PositionsNotCorrect(CustomError):
     pass
+
+
 class BookingNotCorrect(CustomError):
     pass
+
+
 class CheckInAlreadyIn(CustomError):
     pass
+
 
 today = date.today()
 
 while True:
-
 
     cursor = mydb.cursor()
     print("Select Action:\n1)Add a new Customer\n2)Add a new Position\n3)Add a new Booking\n4)Check In\n"
@@ -39,7 +46,7 @@ while True:
     a = input()
 
     ##Exit
-    if(a=='16'):
+    if (a == '16'):
         delete("file.csv")
         cursor.close()
         mydb.close()
@@ -48,11 +55,11 @@ while True:
     elif (a == '1'):
         try:
 
-            id1=int(input("Give customer's Id\n"))
-            name1=input("Give customer's full name\n")
+            id1 = int(input("Give customer's Id\n"))
+            name1 = input("Give customer's full name\n")
             print("Does the customer has another customers who is responsible?If so please type Yes!")
-            ans=input()
-            if ans in ["YES","Yes","yes"]:
+            ans = input()
+            if ans in ["YES", "Yes", "yes"]:
                 print("Please choose the main customer from below:\n")
                 query11 = "SELECT Id, `Full name` FROM Customers"
                 cursor.execute(query11)
@@ -62,13 +69,13 @@ while True:
                     print("Customer's Id: {}, Customer's Full Name: {}\n".format(x[0], x[1]))
                 resId1 = int(input("Please Choose:\n"))
             else:
-                resId1=None
+                resId1 = None
 
-            phone1 =(input("Give customer's phone\n"))
+            phone1 = (input("Give customer's phone\n"))
             year1 = int(input('Enter year of birth\n'))
             month1 = int(input('Enter month of birt\n'))
             day1 = int(input('Enter day of birth\n'))
-            while month1>13 or month1<=0 or day1>=31 or day1<=0:
+            while month1 > 13 or month1 <= 0 or day1 >= 31 or day1 <= 0:
                 print("There is an error with the dates.Please type again.")
                 month1 = int(input('Enter month of birt\n'))
                 day1 = int(input('Enter day of birth\n'))
@@ -76,7 +83,7 @@ while True:
             date1 = datetime.date(year1, month1, day1)
             formatted_date1 = date1.strftime('%Y-%m-%d')
 
-            while date1>today:
+            while date1 > today:
                 print("The date of birth must be before current date. Please give again the customer's day of birth")
                 year1 = int(input('Enter year of birth\n'))
                 month1 = int(input('Enter month of birt\n'))
@@ -84,17 +91,20 @@ while True:
                 date1 = datetime.date(year1, month1, day1)
                 formatted_date1 = date1.strftime('%Y-%m-%d')
 
-            adt1=input("Give ADT\n")
-            cpd1=float(input("Give cost per day\n"))
-            tc1=0
-            val1=(id1,name1,resId1,phone1,formatted_date1,adt1,cpd1,tc1)
+            adt1 = input("Give ADT\n")
+            if ((today.year - year1 > 18) or (today.year - year1 == 18 and today.month - month1 > 0) or (
+                    today.year - year1 == 18 and today.month - month1 == 0 and today.day >= day1)):
+                cpd1 = 5
+            else:
+                cpd1 = 3
+            tc1 = 0
+            val1 = (id1, name1, resId1, phone1, formatted_date1, adt1, cpd1, tc1)
             print("Are you sure you want to add to positions the following:\nCustomer's Id: "
                   , id1, "\nCustomer's Name: ", name1, "\nResponsible customer's Id: ", resId1, "\nPhone Number: "
                   , phone1, "\nDate of Birth: ", formatted_date1, "\nADT: "
-                  , adt1, "\nCost Per Day: ", cpd1,"\nTotal Cost: ",tc1,"\nIf so enter yes")
-            add1=input()
-            if add1 in ["YES","Yes","yes"]:
-
+                  , adt1, "\nCost Per Day: ", cpd1, "\nTotal Cost: ", tc1, "\nIf so enter yes")
+            add1 = input()
+            if add1 in ["YES", "Yes", "yes"]:
 
                 query1 = "INSERT INTO  Customers(Id,`Full name`,ResId,`Phone number`,Birthdate,ADT,`Cost per day`,`Total cost`)" \
                          "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
@@ -125,8 +135,8 @@ while True:
             maxnum2 = int(input("Give position's max number\n"))
             val2 = (id2, type2, usagecost2, electricity2, wifi2, maxnum2)
             print("Are you sure you want to add to positions the following:\nPosition's Id: "
-                  ,id2, "\nPosition's Type:", type2, "\nUsage Cost: ", usagecost2,"\nElectricity: "
-                  , electricity2,"\nWifi: ", wifi2, "\nMax number:", maxnum2,"\nIf so enter yes" )
+                  , id2, "\nPosition's Type:", type2, "\nUsage Cost: ", usagecost2, "\nElectricity: "
+                  , electricity2, "\nWifi: ", wifi2, "\nMax number:", maxnum2, "\nIf so enter yes")
             add2 = input()
             if add2 in ["YES", "Yes", "yes"]:
                 query2 = "INSERT INTO Position (Id,Type,`Usage Cost`,Electricity,Wifi,`Max number`)" \
@@ -202,7 +212,7 @@ while True:
                     raise AllPositionsBooked
                 else:
                     print(result3a)
-                    print("Choose a customers Id from the following\n")
+                    print("Choose a position's Id from the following\n")
                     for x1 in result3a:
                         print("Position's Id: {}".format(x1[0]))
                         print("Position's Type: {}".format(x1[1]))
@@ -222,7 +232,9 @@ while True:
                         print("Please give the number of Children")
                         children = int(input())
                         ### Total Cost
-                        cursor.execute("select `Usage Cost`,`Electricity`,`Wifi`, `Max Number` from Position where `id`=%s;",(posId3,))
+                        cursor.execute(
+                            "select `Usage Cost`,`Electricity`,`Wifi`, `Max Number` from Position where `id`=%s;",
+                            (posId3,))
                         result33 = cursor.fetchall()
                         totaldays = date32 - date31
                         if result33[0][1] in ["YES", "Yes", "yes"]:
@@ -279,9 +291,11 @@ while True:
             print("Something went wrong: {} \n".format(error))
             if error.errno == 1452:
                 if 'REFERENCES `Customers` (`Id`)' in error.msg:
-                    print("There was a problem with the customer's id. Please choose an id that exists on the database\n")
+                    print(
+                        "There was a problem with the customer's id. Please choose an id that exists on the database\n")
                 elif 'REFERENCES `Position` (`Id`)' in error.msg:
-                    print("There was a problem with thw position's id. Please choose an id that exists on the database\n")
+                    print(
+                        "There was a problem with thw position's id. Please choose an id that exists on the database\n")
             elif error.errno == 1062:
                 print("The Booking's id you choose is already in the system")
             elif ArrivalAfterDeparture:
@@ -323,13 +337,16 @@ while True:
                 cursor.execute("SELECT `Due date of departure` FROM Booking WHERE `Id`=%s", (bookId4,))
                 result42 = cursor.fetchall()
                 print("Departure Date is: {}".format(result42[0][0]))
+                cursor.execute("SELECT `Position Id` FROM Booking WHERE `Id`=%s", (bookId4,))
+                result43 = cursor.fetchall()
+                print("Position's Id is: {}".format(result43[0][0]))
                 print("Are you sure you want to add to Check Ins the following:\nBooking's Id: "
                       , bookId4, "\nArrival: ", today, "\nDeparture Date: "
-                      , result42[0][0], "\nIf so enter yes")
+                      , result42[0][0],"Position's Id: ", result43[0][0], "\nIf so enter yes")
                 add4 = input()
-                val4 = (bookId4, today, result42[0][0])
+                val4 = (bookId4, today, result42[0][0],result43[0][0])
                 if add4 in ["YES", "Yes", "yes"]:
-                    query43 = "INSERT INTO Checkin(`Booking Id`, `Arrival Date`,`Due date of departure`) VALUES (%s,%s,%s)"
+                    query43 = "INSERT INTO Checkin(`Booking Id`, `Arrival Date`,`Due date of departure`,`Position Id`) VALUES (%s,%s,%s,%s)"
                     cursor.execute(query43, val4)
                     mydb.commit()
                     print("A new check in was added to the database")
@@ -355,22 +372,23 @@ while True:
         showcsv("file.csv")
     ## Show Future Arrivals
     elif (a == '6'):
-        query6="select  * from Booking " \
-               "WHERE `Due date of arrival`>curdate();"
+        query6 = "select  * from Booking " \
+                 "WHERE `Due date of arrival`>curdate();"
         cursor.execute(query6)
         result6 = cursor.fetchall()
-        firstrow6 = [("Id", "Customer's Id", "Position's Id", " Date of Arranged Arrival", " Date of Departure", "Advance",
-                      "Total Cost","Condition", "Type","Booking Date")]
+        firstrow6 = [
+            ("Id", "Customer's Id", "Position's Id", " Date of Arranged Arrival", " Date of Departure", "Advance",
+             "Total Cost", "Condition", "Type", "Booking Date")]
         create_csv(result6, firstrow6)
         showcsv("file.csv")
     ## Show All Customers
     elif (a == '7'):
-        query="SELECT * FROM Customers"
+        query = "SELECT * FROM Customers"
         cursor.execute(query)
         result = cursor.fetchall()
 
         firstrow = [('Id', 'Full Name', 'ResId', 'Phone Number', 'Birthdate', 'ADT', 'Cost per Day', 'Total Cost')]
-        create_csv(result,firstrow)
+        create_csv(result, firstrow)
         showcsv("file.csv")
     ## Show All Bookings Between 2 Dates
     elif (a == '8'):
@@ -409,7 +427,7 @@ while True:
         create_csv(result, firstrow)
         showcsv("file.csv")
     ##Delete a Booking
-    elif ( a== '10'):
+    elif (a == '10'):
         print("Please choose the book you want to delete:\n")
         query101 = "SELECT Id FROM Booking "
         cursor.execute(query101)
@@ -424,16 +442,16 @@ while True:
         else:
             print("The Id you choose is not correct")
     ##Customer Search By Name
-    elif(a == '11'):
+    elif (a == '11'):
         print("Please enter the full name of the customer you want\n")
-        name11=input()
+        name11 = input()
         cursor.execute("select * from Customers where `Full name`=%s;", (name11,))
         result112 = cursor.fetchall()
         firstrow = [('Id', 'Full Name', 'ResId', 'Phone Number', 'Birthdate', 'ADT', 'Cost per Day', 'Total Cost')]
         create_csv(result112, firstrow)
         showcsv("file.csv")
     ### Check Out
-    elif(a == '12'):
+    elif (a == '12'):
         try:
             try:
                 query121 = "SELECT `Booking Id` FROM Checkin"
@@ -459,25 +477,24 @@ while True:
         except mysql.connector.Error as error:
             print("Something went wrong: {} \n".format(error))
     ### Calculate the total cost of all the bookings of a specific customer
-    elif(a == '13'):
-        custId13=input("Please give the customer's Id: \n")
-        cursor.execute("SELECT `Total Cost` FROM `Booking` WHERE `Customer Id`=%s",(custId13,))
-        result13=cursor.fetchall()
-        totalcost13=0
+    elif (a == '13'):
+        custId13 = input("Please give the customer's Id: \n")
+        cursor.execute("SELECT `Total Cost` FROM `Booking` WHERE `Customer Id`=%s", (custId13,))
+        result13 = cursor.fetchall()
+        totalcost13 = 0
         for i in range(len(result13)):
-            totalcost13=totalcost13 + result13[i][0]
+            totalcost13 = totalcost13 + result13[i][0]
         cursor.execute("UPDATE `Customers` SET `Total Cost`=%s WHERE Id=%s", (totalcost13, custId13,))
         print("The total cost is: ", totalcost13)
         mydb.commit()
     ### Change the arrival date of a booking
-    elif(a=='14'):
-
+    elif (a == '14'):
 
         try:
             query = "SELECT DISTINCT `Customers`.id FROM `Customers` JOIN `Booking` ON `Customers`.id=Booking.`Customer Id` ORDER BY `Customers`.id"
             cursor.execute(query)
             result = cursor.fetchall()
-            result_list=[]
+            result_list = []
             print("The customers ids are:\n")
             for x in range(len(result)):
                 print(result[x][0])
@@ -487,7 +504,6 @@ while True:
             while customer_id not in result_list:
                 print("Give a customer id from the above that exists:")
                 customer_id = int(input("Choose the id that wants to make the changes\n"))
-
 
             cursor.execute("SELECT id,`Position Id`,`Due date of arrival`,`Due date of departure` "
                            "FROM Booking "
@@ -516,13 +532,13 @@ while True:
 
                     break
 
-            print("Booking id:",result[row][0])
+            print("Booking id:", result[row][0])
 
-            print("Position id:",result[row][1])
+            print("Position id:", result[row][1])
 
-            print("Arrival Date:",result[row][2])
+            print("Arrival Date:", result[row][2])
 
-            print("Departure Date:",result[row][3])
+            print("Departure Date:", result[row][3])
 
             print("\n")
             year11 = int(input('Enter  year of arrival\n'))
@@ -535,15 +551,14 @@ while True:
             date11 = datetime.date(year11, month11, day11)
             ArrivalDate = date11.strftime('%Y-%m-%d')
 
-
             current_arrival_date = datetime.date(result[row][2].year, result[row][2].month, result[row][2].day)
             departure_date = datetime.date(result[row][3].year, result[row][3].month, result[row][3].day)
 
             cursor.execute("SELECT p.`Usage Cost`,p.`Electricity`,p.`Wifi`,b.`Adult`,b.`Underage` "
-                          "FROM `Position` p "
-                          "JOIN `Booking` b ON p.`Id`=b.`Position Id` "
-                          "WHERE b.`id`= %s ",(result[row][0],))
-            resultc=cursor.fetchall()
+                           "FROM `Position` p "
+                           "JOIN `Booking` b ON p.`Id`=b.`Position Id` "
+                           "WHERE b.`id`= %s ", (result[row][0],))
+            resultc = cursor.fetchall()
 
             if resultc[0][1] in ["YES", "Yes", "yes"]:
                 electr = 2
@@ -565,13 +580,14 @@ while True:
                     day11 = int(input('Enter day of arrival\n'))
                 date11 = datetime.date(year11, month11, day11)
 
-            total_days14=departure_date-date11
-            totalcost14 = total_days14.days * resultc[0][0] + resultc[0][3] * total_days14.days * 5 + resultc[0][4] * total_days14.days * 3 + total_days14.days * electr + total_days14.days *wifi
+            total_days14 = departure_date - date11
+            totalcost14 = total_days14.days * resultc[0][0] + resultc[0][3] * total_days14.days * 5 + resultc[0][
+                4] * total_days14.days * 3 + total_days14.days * electr + total_days14.days * wifi
 
             if date11 > current_arrival_date:
                 cursor.execute("UPDATE `Booking` "
                                "SET `Due date of arrival`=%s, `Total Cost`= %s "
-                               "WHERE id=%s ", (date11,totalcost14, book_id))
+                               "WHERE id=%s ", (date11, totalcost14, book_id))
 
                 result11 = mydb.commit()
                 print("Change is made!\n")
@@ -592,7 +608,7 @@ while True:
                 if len(result11_a) == 1:
                     cursor.execute("UPDATE `Booking` "
                                    "SET `Due date of arrival`=%s ,`Total Cost`= %s "
-                                   "WHERE id=%s ", (date11,totalcost14, book_id))
+                                   "WHERE id=%s ", (date11, totalcost14, book_id))
                     mydb.commit()
                     print("Change is made!\n")
                 else:
@@ -623,7 +639,8 @@ while True:
                         if ans in ["YES", "yes", "Yes"]:
                             pos_id = int(input("Choose one of the above positions id:\n"))
                             cursor.execute("UPDATE `Booking` "
-                                           "SET `Due date of arrival`=%s ,`Position Id`=%s ,`Total Cost`= %s WHERE id=%s ", (date11, pos_id, totalcost14,book_id))
+                                           "SET `Due date of arrival`=%s ,`Position Id`=%s ,`Total Cost`= %s WHERE id=%s ",
+                                           (date11, pos_id, totalcost14, book_id))
                             mydb.commit()
                             print("Change is made!\n")
                         else:
@@ -632,7 +649,6 @@ while True:
             print("Something went wrong! \n")
 
     elif (a == '15'):
-
 
         try:
             query = "SELECT DISTINCT `Customers`.id FROM `Customers` " \
@@ -649,8 +665,6 @@ while True:
             while customer_id not in result_list15:
                 print("Give a customer id from the above that exists:")
                 customer_id = int(input("Choose the id that wants to make the changes\n"))
-
-
 
             cursor.execute("SELECT id,`Position Id`,`Due date of arrival`,`Due date of departure` "
                            "FROM Booking "
@@ -730,13 +744,14 @@ while True:
                     day12 = int(input('Enter day of departure\n'))
                 date12 = datetime.date(year12, month12, day12)
 
-            total_days15 =  date12 - arrival_date
-            totalcost15 = total_days15.days * resultc[0][0] + resultc[0][3] * total_days15.days * 5 + resultc[0][4] * total_days15.days * 3 + total_days15.days * electr + total_days15.days * wifi
-
+            total_days15 = date12 - arrival_date
+            totalcost15 = total_days15.days * resultc[0][0] + resultc[0][3] * total_days15.days * 5 + resultc[0][
+                4] * total_days15.days * 3 + total_days15.days * electr + total_days15.days * wifi
 
             if date12 < current_departure_date:
                 cursor.execute("UPDATE `Booking` "
-                               "SET `Due date of departure`=%s ,`Total Cost`= %s WHERE id=%s ", (date12, totalcost15 , book_id)
+                               "SET `Due date of departure`=%s ,`Total Cost`= %s WHERE id=%s ",
+                               (date12, totalcost15, book_id)
                                )
                 mydb.commit()
                 print("Change is made!\n")
@@ -758,7 +773,7 @@ while True:
                 if len(result12_a) == 1:
                     cursor.execute("UPDATE `Booking` "
                                    "SET `Due date of departure`=%s,`Total Cost`= %s "
-                                   "WHERE id=%s ", (date12,totalcost15,book_id))
+                                   "WHERE id=%s ", (date12, totalcost15, book_id))
                     mydb.commit()
                     print("Change is made!\n")
                 else:
@@ -789,7 +804,7 @@ while True:
                             pos_id = int(input("Choose one of the above positions id:\n"))
                             cursor.execute("UPDATE `Booking` "
                                            "SET `Due date of departure`=%s ,`Position Id`=%s,`Total Cost`= %s "
-                                           "WHERE id=%s ", (date12, pos_id,totalcost15 ,book_id))
+                                           "WHERE id=%s ", (date12, pos_id, totalcost15, book_id))
                             mydb.commit()
                             print("Change is made!\n")
                         else:
