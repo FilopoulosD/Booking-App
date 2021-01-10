@@ -47,7 +47,7 @@ while True:
     ## Add a new Customer
     elif (a == '1'):
         try:
-
+ 
             id1=int(input("Give customer's Id\n"))
             name1=input("Give customer's full name\n")
             print("Does the customer has another customers who is responsible?If so please type Yes!")
@@ -85,7 +85,10 @@ while True:
                 formatted_date1 = date1.strftime('%Y-%m-%d')
 
             adt1=input("Give ADT\n")
-            cpd1=float(input("Give cost per day\n"))
+            if ((today.year - year1 > 18) or (today.year - year1 ==18 and today.month - month1 > 0) or(today.year - year1 ==18 and today.month - month1==0 and today.day >= day1)):
+                cpd1 = 5
+            else:
+                cpd1 = 3
             tc1=0
             val1=(id1,name1,resId1,phone1,formatted_date1,adt1,cpd1,tc1)
             print("Are you sure you want to add to positions the following:\nCustomer's Id: "
