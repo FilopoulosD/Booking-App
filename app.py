@@ -91,7 +91,7 @@ while True:
                 cpd1 = 3
             tc1=0
             val1=(id1,name1,resId1,phone1,formatted_date1,adt1,cpd1,tc1)
-            print("Are you sure you want to add to positions the following:\nCustomer's Id: "
+            print("Are you sure you want to add to customer's the following:\nCustomer's Id: "
                   , id1, "\nCustomer's Name: ", name1, "\nResponsible customer's Id: ", resId1, "\nPhone Number: "
                   , phone1, "\nDate of Birth: ", formatted_date1, "\nADT: "
                   , adt1, "\nCost Per Day: ", cpd1,"\nTotal Cost: ",tc1,"\nIf so enter yes")
