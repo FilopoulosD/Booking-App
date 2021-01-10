@@ -205,7 +205,7 @@ while True:
                     raise AllPositionsBooked
                 else:
                     print(result3a)
-                    print("Choose a customers Id from the following\n")
+                    print("Choose a position's Id from the following\n")
                     for x1 in result3a:
                         print("Position's Id: {}".format(x1[0]))
                         print("Position's Type: {}".format(x1[1]))
