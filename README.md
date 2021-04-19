@@ -18,5 +18,5 @@ You can download mysql.connector from this link: https://dev.mysql.com/downloads
   Select your OS and install the library.
 
 The other libraries are included with every standar installation of Python. 		
-4)Run the app.py in any Python Interpreter and use our app :)
+4)Run the app.py in any Python Interpreter and use the app :)
 
